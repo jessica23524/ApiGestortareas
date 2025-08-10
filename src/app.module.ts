@@ -9,21 +9,20 @@ import { User } from './users/user.entity';
 
 @Module({
   imports: [
-    // Carga automáticamente el archivo .env y lo hace global
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    // Conexión a la base de datos
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT ?? '5433', 10),
-      username: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'jessica',
-      database: process.env.DB_NAME || 'tareas',
+      host: process.env.PGHOST || process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.PGPORT || process.env.DB_PORT || '5433', 10),
+      username: process.env.PGUSER || process.env.DB_USER || 'postgres',
+      password: process.env.PGPASSWORD || process.env.DB_PASSWORD || 'jessica',
+      database: process.env.PGDATABASE || process.env.DB_NAME || 'tareas',
       entities: [Task, User],
-      synchronize: true, // en producción puedes poner false
+      synchronize: true,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     }),
 
     TasksModule,
